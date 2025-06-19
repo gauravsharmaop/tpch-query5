@@ -3,71 +3,18 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <map>
 
-// Optimized structures for TPC-H Query 5
-struct Customer {
-    uint32_t custkey;
-    uint16_t nationkey;
-    Customer(uint32_t ck, uint16_t nk) : custkey(ck), nationkey(nk) {}
-};
-
-struct Order {
-    uint32_t orderkey;
-    uint32_t custkey;
-    uint32_t orderdate; // days since epoch
-    Order(uint32_t ok, uint32_t ck, uint32_t od) : orderkey(ok), custkey(ck), orderdate(od) {}
-};
-
-struct LineItem {
-    uint32_t orderkey;
-    uint32_t suppkey;
-    double revenue; // extendedprice * (1 - discount)
-    LineItem(uint32_t ok, uint32_t sk, double rev) : orderkey(ok), suppkey(sk), revenue(rev) {}
-};
-
-struct Supplier {
-    uint32_t suppkey;
-    uint16_t nationkey;
-    Supplier(uint32_t sk, uint16_t nk) : suppkey(sk), nationkey(nk) {}
-};
-
-struct Nation {
-    uint16_t nationkey;
-    uint16_t regionkey;
-    std::string name;
-    Nation(uint16_t nk, uint16_t rk, std::string n) : nationkey(nk), regionkey(rk), name(std::move(n)) {}
-};
-
-struct Region {
-    uint16_t regionkey;
-    std::string name;
-    Region(uint16_t rk, std::string n) : regionkey(rk), name(std::move(n)) {}
-};
-
-// Function declarations for the optimized implementation
+// Function to parse command line arguments
 bool parseArgs(int argc, char* argv[], std::string& r_name, std::string& start_date, std::string& end_date, int& num_threads, std::string& table_path, std::string& result_path);
 
-bool readOptimizedData(const std::string& table_path,
-                      std::vector<Customer>& customers,
-                      std::vector<Order>& orders,
-                      std::vector<LineItem>& lineitems,
-                      std::vector<Supplier>& suppliers,
-                      std::vector<Nation>& nations,
-                      std::vector<Region>& regions);
+// Function to read TPCH data from the specified paths
+bool readTPCHData(const std::string& table_path, std::vector<std::map<std::string, std::string>>& customer_data, std::vector<std::map<std::string, std::string>>& orders_data, std::vector<std::map<std::string, std::string>>& lineitem_data, std::vector<std::map<std::string, std::string>>& supplier_data, std::vector<std::map<std::string, std::string>>& nation_data, std::vector<std::map<std::string, std::string>>& region_data);
 
-bool executeOptimizedQuery5(const std::string& r_name,
-                           const std::string& start_date,
-                           const std::string& end_date,
-                           int num_threads,
-                           const std::vector<Customer>& customers,
-                           const std::vector<Order>& orders,
-                           const std::vector<LineItem>& lineitems,
-                           const std::vector<Supplier>& suppliers,
-                           const std::vector<Nation>& nations,
-                           const std::vector<Region>& regions,
-                           std::unordered_map<std::string, double>& results);
+// Function to execute TPCH Query 5 using multithreading
+bool executeQuery5(const std::string& r_name, const std::string& start_date, const std::string& end_date, int num_threads, const std::vector<std::map<std::string, std::string>>& customer_data, const std::vector<std::map<std::string, std::string>>& orders_data, const std::vector<std::map<std::string, std::string>>& lineitem_data, const std::vector<std::map<std::string, std::string>>& supplier_data, const std::vector<std::map<std::string, std::string>>& nation_data, const std::vector<std::map<std::string, std::string>>& region_data, std::map<std::string, double>& results);
 
-bool outputResults(const std::string& result_path, const std::unordered_map<std::string, double>& results);
+// Function to output results to the specified path
+bool outputResults(const std::string& result_path, const std::map<std::string, double>& results);
 
-#endif // QUERY5_HPP
+#endif // QUERY5_HPP 
