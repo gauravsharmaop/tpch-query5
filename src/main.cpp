@@ -1,48 +1,44 @@
 #include "query5.hpp"
 #include <iostream>
-#include <fstream>
-#include <vector>
 #include <string>
-#include <unordered_map>
+#include <vector>
+#include <thread>
+#include <mutex>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <map>
 
-// No need for legacy includes like <map>, <sstream>, etc.
+// TODO: Include additional headers as needed
 
 int main(int argc, char* argv[]) {
     std::string r_name, start_date, end_date, table_path, result_path;
     int num_threads;
 
-    // Parse command line arguments (optimized version)
     if (!parseArgs(argc, argv, r_name, start_date, end_date, num_threads, table_path, result_path)) {
-        std::cerr << "Error parsing arguments\n";
+        std::cerr << "Failed to parse command line arguments." << std::endl;
         return 1;
     }
 
-    // Load data into optimized structures
-    std::vector<Customer> customers;
-    std::vector<Order> orders;
-    std::vector<LineItem> lineitems;
-    std::vector<Supplier> suppliers;
-    std::vector<Nation> nations;
-    std::vector<Region> regions;
+    std::vector<std::map<std::string, std::string>> customer_data, orders_data, lineitem_data, supplier_data, nation_data, region_data;
 
-    if (!readOptimizedData(table_path, customers, orders, lineitems, suppliers, nations, regions)) {
-        std::cerr << "Error reading data files\n";
+    if (!readTPCHData(table_path, customer_data, orders_data, lineitem_data, supplier_data, nation_data, region_data)) {
+        std::cerr << "Failed to read TPCH data." << std::endl;
         return 1;
     }
 
-    // Execute optimized query
-    std::unordered_map<std::string, double> results;
-    if (!executeOptimizedQuery5(r_name, start_date, end_date, num_threads,
-                                customers, orders, lineitems, suppliers, nations, regions, results)) {
-        std::cerr << "Error executing query\n";
+    std::map<std::string, double> results;
+
+    if (!executeQuery5(r_name, start_date, end_date, num_threads, customer_data, orders_data, lineitem_data, supplier_data, nation_data, region_data, results)) {
+        std::cerr << "Failed to execute TPCH Query 5." << std::endl;
         return 1;
     }
 
-    // Output results
     if (!outputResults(result_path, results)) {
-        std::cerr << "Error writing results\n";
+        std::cerr << "Failed to output results." << std::endl;
         return 1;
     }
 
+    std::cout << "TPCH Query 5 implementation completed." << std::endl;
     return 0;
-}
+} 
